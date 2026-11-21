@@ -1,5 +1,5 @@
 ---
-name: balanced-coupling
+name: modularity-balanced-coupling
 description: >
   The Balanced Coupling model for software design. Use when: designing modular architectures,
   evaluating coupling between components, reviewing code modularity, deciding whether to split
@@ -8,7 +8,7 @@ description: >
   coupling trade-offs, identifying distributed monolith risks, or explaining why a system
   is hard to change. Provides the three-dimensional framework (integration strength, distance,
   volatility) and the balance rule for making coupling decisions.
-user-invocable: false
+disable-model-invocation: true
 ---
 
 # The Balanced Coupling Model

@@ -1,10 +1,10 @@
 ---
-name: document
+name: modularity-document
 description: >
   Produces modularity review documents in both Markdown and HTML formats.
   Use when writing the final review output from a modularity analysis.
-user-invocable: false
-allowed-tools: Read, Write
+disable-model-invocation: true
+allowed-tools: read, write, bash
 ---
 
 # Document
@@ -128,14 +128,16 @@ _This analysis was performed using the [Balanced Coupling](https://coupling.dev)
 
 ## Output
 
-Write both files to `docs/modularity-review/!`date +%Y-%m-%d`/`:
+Write both files to `docs/modularity-review/<date>/`:
 
-1. `docs/modularity-review/!`date +%Y-%m-%d`/modularity-review.md` — the Markdown version
-2. `docs/modularity-review/!`date +%Y-%m-%d`/modularity-review.html` — the HTML version
+1. `docs/modularity-review/<date>/modularity-review.md` — the Markdown version
+2. `docs/modularity-review/<date>/modularity-review.html` — the HTML version
+
+`<date>` is today's date: run `date +%Y-%m-%d` with the `bash` tool and use the value in both paths. Paths are relative to the project root.
 
 ### HTML generation
 
-**You MUST read the template file before generating HTML.** The template is at `${CLAUDE_SKILL_DIR}/assets/template.html`. Read this file, then replace:
+**You MUST read the template file before generating HTML.** The template is at `assets/template.html` inside this skill's directory — resolve it against the path this skill was loaded from (Pi reports it). Read that file, then replace:
 
 - `{{TITLE}}` with the review title (e.g. "Modularity Review")
 - `{{CONTENT}}` with the review body as HTML

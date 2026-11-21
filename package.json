@@ -1,0 +1,26 @@
+{
+  "name": "modularity",
+  "version": "1.5.0",
+  "description": "Design and analyze modular software systems using the Balanced Coupling model by Vlad Khononov. Includes a modularity review skill for analyzing existing codebases and a modular design skill for designing new systems from requirements.",
+  "keywords": [
+    "pi-package",
+    "skills",
+    "architecture",
+    "modularity",
+    "coupling",
+    "ddd"
+  ],
+  "license": "SEE LICENSE IN LICENSE",
+  "author": {
+    "name": "Vlad Khononov"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vladikk/modularity.git"
+  },
+  "pi": {
+    "skills": [
+      "./skills"
+    ]
+  }
+}

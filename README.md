@@ -1,13 +1,13 @@
 # Modularity Skills
 
-**TL;DR:** A [Claude Code](https://code.claude.com) plugin for designing and analyzing modular software systems using the [Balanced Coupling](https://coupling.dev) model.
+**TL;DR:** A [Pi](https://pi.dev) package for designing and analyzing modular software systems using the [Balanced Coupling](https://coupling.dev) model.
 
 There's no shortage of AI tools that provide code-level feedback: best practices, edge cases, potential bugs. That's useful, but it's not where the costly mistakes hide. In the AI era, code is generated faster than ever, and so technical debt accumulates faster too. Any architectural inefficiency, any misdrawn boundary, any unmanaged coupling will grow into a big ball of mud at a pace that wasn't possible before.
 
-This plugin operates at the architectural level. It includes two skills:
+This package operates at the architectural level. It includes two skills:
 
-- **`/modularity:review`** analyzes an existing codebase for coupling imbalances: what knowledge is properly encapsulated, what's leaking across component boundaries, and where cascading changes are waiting to happen. It produces actionable recommendations for improving modularity.
-- **`/modularity:design`** goes the other direction, designing modular architectures from functional requirements and producing module design docs with integration contracts, test specifications, and a full coupling assessment.
+- **`/skill:modularity-review`** analyzes an existing codebase for coupling imbalances: what knowledge is properly encapsulated, what's leaking across component boundaries, and where cascading changes are waiting to happen. It produces actionable recommendations for improving modularity.
+- **`/skill:modularity-design`** goes the other direction, designing modular architectures from functional requirements and producing module design docs with integration contracts, test specifications, and a full coupling assessment.
 
 Both skills are grounded in the [Balanced Coupling](https://coupling.dev) model, so every recommendation traces back to a concrete dimension (integration strength, distance, volatility), not gut feel.
 
@@ -15,25 +15,48 @@ Both skills are grounded in the [Balanced Coupling](https://coupling.dev) model,
 
 ## Installation
 
-Requires [Claude Code](https://code.claude.com/docs/en/quickstart) v1.0.33 or later.
+Requires [Pi](https://pi.dev).
 
-Add the marketplace and install the plugin:
+Install the package from git (personal scope — available in every project):
 
+```bash
+pi install git:github.com/vladikk/modularity
 ```
-/plugin marketplace add vladikk/modularity
-/plugin install modularity@vladikk-modularity
+
+Pin a ref, and install it into the current project only (`.pi/settings.json`, loaded after project trust):
+
+```bash
+pi install git:github.com/vladikk/modularity@v1.5.0 --local
 ```
 
-Alternatively, clone the repo and load it directly:
+Then start `pi` in your project and run `/reload` if Pi was already running.
+
+### Other ways to load it
+
+Clone and load it from a path (useful while hacking on the skills):
 
 ```bash
 git clone https://github.com/vladikk/modularity.git
-claude --plugin-dir ./modularity
+pi install ./modularity          # persistent
+pi -e ./modularity               # one session only
 ```
+
+Copy the skills into a skills directory — each skill is a plain `SKILL.md` directory in the [Agent Skills](https://agentskills.io/specification) format:
+
+```bash
+mkdir -p ~/.pi/agent/skills
+cp -r skills/* ~/.pi/agent/skills/
+```
+
+Project scope: `.pi/skills/` or `.agents/skills/` in the repository root.
+
+Manage installations with `pi list`, `pi config` (enable/disable individual resources), and `pi remove git:github.com/vladikk/modularity`.
 
 ## Skills
 
-### `/modularity:review` — Modularity Review
+Skills are available as `/skill:<name>`. Typing `/skill:` shows the list.
+
+### `/skill:modularity-review` — Modularity Review
 
 Analyzes an existing codebase for coupling imbalances. Use when:
 
@@ -53,12 +76,12 @@ Analyzes an existing codebase for coupling imbalances. Use when:
 **Usage:**
 
 ```
-/modularity:review
+/skill:modularity-review
 ```
 
 The review output includes hyperlinks to [coupling.dev](https://coupling.dev) for each coupling concept referenced.
 
-### `/modularity:design` — Modular Design
+### `/skill:modularity-design` — Modular Design
 
 Designs modular architectures from functional requirements. Use when:
 
@@ -81,8 +104,28 @@ Each step requires your approval before proceeding.
 **Usage:**
 
 ```
-/modularity:design
+/skill:modularity-design path/to/functional-requirements.md
 ```
+
+Text after the command is passed to the skill as its request; without it, the skill asks for the requirements file.
+
+### Reference skills
+
+Two skills support the two above and are marked `disable-model-invocation: true`, so they never fire on their own. They are loaded by the skills that need them, and remain available as `/skill:modularity-balanced-coupling` and `/skill:modularity-document` if you want them directly:
+
+- **`modularity-balanced-coupling`** — the full model reference (dimensions, balance rule, DDD links)
+- **`modularity-document`** — review document structure, coupling.dev link table, and the HTML template
+
+## Output
+
+- Review: `docs/modularity-review/<date>/modularity-review.{md,html}`
+- Design: `docs/design/<date>/architecture.md` and `docs/design/<date>/<module>/{design,tests}.md`
+
+`<date>` is the day the skill ran (`YYYY-MM-DD`), resolved by the agent with `date +%Y-%m-%d`.
+
+## Requirements
+
+The skills use only Pi's built-in tools (`read`, `bash`, `edit`, `write`, `grep`, `find`, `ls`) and ask you questions in plain chat — no extra extensions, MCP servers, or dialogs needed. An LSP-backed navigation tool, if present in your session, is used when available to confirm integration points.
 
 ## The Balanced Coupling Model
 
@@ -101,6 +144,10 @@ Learn more at [coupling.dev](https://coupling.dev).
 ## Recommended Models
 
 Claude Opus 4.5 or later. The skills rely on nuanced architectural reasoning that benefits from the most capable models.
+
+## Claude Code
+
+The skills follow the Agent Skills specification, so they also work in Claude Code — copy `skills/*` into `~/.claude/skills/` (or `.claude/skills/` in a project) and invoke them by name. The Pi package manifest (`package.json`) is ignored there.
 
 ## License
 

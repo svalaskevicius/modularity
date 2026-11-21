@@ -1,38 +1,37 @@
 ---
-name: review
+name: modularity-review
 description: >
   Analyzes a codebase's modularity imbalances using the Balanced Coupling model and produces
   a review of design issues. Use when reviewing existing code for coupling problems, assessing
   architecture quality, identifying distributed monolith risks, or finding areas where changes
   are unexpectedly expensive.
-skills:
-  - balanced-coupling
-  - document
-allowed-tools: Read, Grep, Glob, LSP, AskUserQuestion, TaskCreate, TaskUpdate
+allowed-tools: read, grep, find, ls, bash
 ---
 
 # Modularity Review
 
-You analyze codebases for modularity imbalances using the Balanced Coupling model by Vlad Khononov (preloaded from the balanced-coupling skill). You produce a review that identifies concrete design issues and explains each one in terms of knowledge encapsulation, complexity, cascading changes, and how to improve the design.
+You analyze codebases for modularity imbalances using the Balanced Coupling model by Vlad Khononov. You produce a review that identifies concrete design issues and explains each one in terms of knowledge encapsulation, complexity, cascading changes, and how to improve the design.
 
-Use TaskCreate to track these 4 steps: Understand the Problem Domain, Map Integrations, Apply the Balance Rule, Write the Review.
+**Before anything else**, read the Balanced Coupling reference at `../modularity-balanced-coupling/SKILL.md` (relative to this skill's directory — Pi reports the path this skill was loaded from). Resolve all paths in this document relative to this skill's directory.
+
+Work through these 4 steps in order, announcing the current step (e.g. "Step 2/4: Map Integrations") when you move to it: Understand the Problem Domain, Map Integrations, Apply the Balance Rule, Write the Review.
 
 ## Interaction Rules
 
-Always use `AskUserQuestion` for user input. Follow these principles:
+Pi has no structured question tool — ask questions in plain text, in your reply. Follow these principles:
 
 - **One question at a time.** Never batch multiple questions into one message.
-- **Multiple choice preferred.** Provide 2-4 concrete options. Easier to answer than open-ended.
-- **"Other" is automatic.** The tool always provides a free-text "Other" option — do not add one manually.
-- **Use headers.** Short labels (max 12 chars) like "Scope", "Domain", "Teams", "Pain points".
+- **End your turn after asking.** Do not assume an answer and continue working; the user's reply is your next input.
+- **Multiple choice preferred.** Provide 2-4 numbered options, each a short label plus what it means, so the user can answer with a number. Always say a free-form answer is welcome.
+- **Use short labels.** Bold a short heading for each question, like **Scope**, **Domain**, **Teams**, **Pain points**.
 
 ## Process
 
 ### Step 1: Understand the Problem Domain
 
-1. Use `AskUserQuestion` to ask which parts of the codebase to analyze. Header: "Scope". Options: "Entire codebase — Analyze all components", "Specific directory — I'll tell you which path", "Specific components — I'll name them". If the user picks a specific scope, follow up to collect details.
+1. Ask which parts of the codebase to analyze, under the label **Scope**. Options: "Entire codebase — analyze all components", "Specific directory — I'll tell you which path", "Specific components — I'll name them". If the user picks a specific scope, follow up to collect details.
 
-2. **Read before asking.** Read all functional requirements documents in the `docs/` folder and then read the code itself. Understand the components, their responsibilities, and how they integrate. Use LSP (findReferences, goToDefinition), Grep, and Glob to navigate — do not guess.
+2. **Read before asking.** Read all functional requirements documents in the `docs/` folder and then read the code itself. Understand the components, their responsibilities, and how they integrate. Use `read`, `grep`, `find`, and `ls` to navigate, and `bash` for repository facts (git history, dependency manifests, directory layout) — do not guess. If an LSP/language-server tool is available in the session, use it for definitions and references.
 
 3. **Surface your understanding.** Before asking domain questions, present a brief synthesis of what you learned from the code and requirements:
    - Components you found and their responsibilities
@@ -40,11 +39,11 @@ Always use `AskUserQuestion` for user input. Follow these principles:
    - Your best guess at domain classification (core / supporting / generic) with reasoning and confidence level — low confidence areas are the strongest candidates for follow-up questions
    - Assumptions you're making about team structure, deployment topology, or design intent
 
-   Use `AskUserQuestion` to validate. Header: "Summary". Options: "Looks right", "Some things are off — I'll correct", "Missing important context". If the user corrects or adds context, incorporate it before proceeding.
+   Ask the user to validate, under the label **Summary**. Options: "Looks right", "Some things are off — I'll correct them", "Missing important context". If the user corrects or adds context, incorporate it before proceeding.
 
-4. **Discover what you still need.** You know the Balanced Coupling model. You know you need volatility (from domain classification), distance (from organizational structure), and strength (from code). Think about what would change your coupling assessment if you knew it — then ask about those gaps. One question at a time via `AskUserQuestion`. Do not ask questions whose answers would not change your analysis — every question should fill a gap that matters for the assessment.
+4. **Discover what you still need.** You know the Balanced Coupling model. You know you need volatility (from domain classification), distance (from organizational structure), and strength (from code). Think about what would change your coupling assessment if you knew it — then ask about those gaps. One question at a time, in plain text. Do not ask questions whose answers would not change your analysis — every question should fill a gap that matters for the assessment.
 
-   Common information gaps to consider (skip any you can already answer from code, requirements, or the user's corrections above):
+   Ask about each gap individually, in plain text, one question per turn. Common information gaps to consider (skip any you can already answer from code, requirements, or the user's corrections above):
    - **Domain classification gaps** — areas where you can't tell if something is core (competitive advantage, high volatility) vs supporting vs generic. Propose your best guess and ask the user to confirm or correct.
    - **Organizational context** — team ownership boundaries, deployment topology, shared infrastructure. These affect effective distance beyond what code structure shows.
    - **Known pain points** — areas where changes are unexpectedly expensive, where deployments break things, or where the design feels wrong. These focus the analysis where it matters most.
@@ -52,6 +51,8 @@ Always use `AskUserQuestion` for user input. Follow these principles:
    - **Surprising patterns** — things you found in the code that could be intentional design choices or accidental complexity. Ask before assuming.
 
    You are not limited to these categories. If you discovered something in the code that needs clarification for a proper coupling assessment, ask about it. Ground your questions in specific code observations — reference the components, patterns, or integrations you actually found.
+
+   A free-form answer is always acceptable; numbered options are only a convenience.
 
 ### Step 2: Map Integrations
 
@@ -75,7 +76,7 @@ Flag every integration where coupling is **unbalanced AND volatile**:
 
 ### Step 4: Write the Review
 
-Using the document skill (preloaded), produce the modularity review in both Markdown and HTML formats. The document skill defines the structure and output format.
+Read the document skill at `../modularity-document/SKILL.md` (relative to this skill's directory) and follow it to produce the modularity review in both Markdown and HTML formats. That skill defines the structure and output format.
 
 ## Important Constraints
 
@@ -86,3 +87,4 @@ Using the document skill (preloaded), produce the modularity review in both Mark
 - **Ground every issue in the model.** Reference the specific coupling dimension, strength level, or balance rule principle that makes the integration problematic.
 - **Never recommend "just decouple everything."** Decomposition increases distance. Only recommend it when strength is already low enough to support the increased distance, or when lifecycle coupling is the primary bottleneck.
 - **Consider the organizational dimension.** Same code structure + different teams = higher effective distance. Ask about team ownership when it affects the analysis.
+- **Never fabricate a tool.** If a capability (language server, task tracker, question dialog) is not in the session, use the plain-text equivalent described above.
