@@ -20,37 +20,18 @@ Requires [Pi](https://pi.dev).
 Install the package from git (personal scope — available in every project):
 
 ```bash
-pi install git:github.com/vladikk/modularity
+pi install git:github.com/svalaskevicius/modularity@pi
 ```
 
 Pin a ref, and install it into the current project only (`.pi/settings.json`, loaded after project trust):
 
 ```bash
-pi install git:github.com/vladikk/modularity@v1.5.0 --local
+pi install git:github.com/svalaskevicius/modularity@pi --local
 ```
+
+`@` takes any git ref — a branch (`@main`, `@feature/foo`), a tag (`@v1.5.0`), or a commit (`@e04ba57`). A ref pins the entry, so Pi never refreshes it on its own; move a pinned branch with `pi update git:github.com/svalaskevicius/modularity@pi` (or `pi update --extensions`). Without a ref, you track the default branch and Pi checks for updates at startup.
 
 Then start `pi` in your project and run `/reload` if Pi was already running.
-
-### Other ways to load it
-
-Clone and load it from a path (useful while hacking on the skills):
-
-```bash
-git clone https://github.com/vladikk/modularity.git
-pi install ./modularity          # persistent
-pi -e ./modularity               # one session only
-```
-
-Copy the skills into a skills directory — each skill is a plain `SKILL.md` directory in the [Agent Skills](https://agentskills.io/specification) format:
-
-```bash
-mkdir -p ~/.pi/agent/skills
-cp -r skills/* ~/.pi/agent/skills/
-```
-
-Project scope: `.pi/skills/` or `.agents/skills/` in the repository root.
-
-Manage installations with `pi list`, `pi config` (enable/disable individual resources), and `pi remove git:github.com/vladikk/modularity`.
 
 ## Skills
 
